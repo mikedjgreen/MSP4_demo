@@ -26,6 +26,9 @@ You should consider upgrading via the '/home/gitpod/.pyenv/versions/3.8.7/bin/py
 
 ```django-admin startproject boutique_ado . ```
 
+- ![start project directories](/boutique_ado/static/docs/start_project.jpg)
+
+
 #### .gitignore
 - core.Microsoft*
 - core.mongo*
@@ -68,6 +71,131 @@ password:
 >origin  https://github.com/mikedjgreen/MSP4_demo.git (fetch)
 origin  https://github.com/mikedjgreen/MSP4_demo.git (push)
 
+## Authentication system
+
+```pip3 install django-allauth```
+
+...
+
+>Successfully built django-allauth
+Installing collected packages: pyjwt, oauthlib, requests-oauthlib, python3-openid, django-allauth
+Successfully installed django-allauth-0.44.0 oauthlib-3.1.0 pyjwt-2.0.1 python3-openid-3.2.0 requests-oauthlib-1.3.0
+
+[Allauth documentation](https://django-allauth.readthedocs.io/en/latest/installation.html)
+
+### settings.py
+Need to add allauth entries to the settings.py .
+
+INSTALLED_APPS
+
+-    'django.contrib.sites',
+
+-    'allauth',
+-    'allauth.account',
+-    'allauth.socialaccount',
+
+After AUTHENTICATION_BACKENDS:
+
+```SITE_ID = 1```
+
+### urls.py
+
+```from django.urls import path, include```
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+]
+
+### Added new apps, need to migrate
+
+```python3 manage.py migrate```
+
+>Operations to perform:
+  Apply all migrations: account, admin, auth, contenttypes, sessions, sites, socialaccount
+Running migrations:
+  Applying account.0001_initial... OK
+  Applying account.0002_email_max_length... OK
+  Applying sites.0001_initial... OK
+  Applying sites.0002_alter_domain_unique... OK
+  Applying socialaccount.0001_initial... OK
+  Applying socialaccount.0002_token_max_lengths... OK
+  Applying socialaccount.0003_extra_data_default_dict... OK
+
+### Runserver, with admin
+
+```python3 manage.py runserver```
+
+This gives a 404 error, but append /admin to URL to get:
+
+- ![admin login](/boutique_ado/static/docs/admin_login.jpg)
+
+Login with mdjg.
+
+- ![mdjg logged in](/boutique_ado/static/docs/mdjg_logged_in.jpg)
+
+Alter site to boutiqueado.example.com.
+
+### Additional settings.py
+
+Temporarily log emails to console to get the confirmation links.
+
+``` 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend' 
+```
+```
+ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'
+ACCOUNT_SIGNUP_EMAIL_ENTER_TWICE = True
+ACCOUNT_USERNAME_MIN_LENGTH = 4
+LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/##success##'
+```
+
+##success## is temporary setting to test.
+Test this with:
+``` python3 manage.py runserver ```
+
+Get Page not found (404).
+
+Navigate to ```/accounts/login``` at the end of the url.  
+
+
+Get: 
+- ![accounts login](/boutique_ado/static/docs/accounts_login.jpg)
+
+The superuser was setup prior to installing allauth, so an email has not been associated with this login.
+
+Can set this for 'mdjg' by logging into admin.
+
+Need to set accounts' email addresses, and search for account mdjg.
+Add an email address and tick verify.
+
+- ![add email address](/boutique_ado/static/docs/add_email_addr.jpg)
+
+
+
+#### With 'allauth' working, need to set up requirements.txt.
+
+```pip3 freeze > requirements.txt ```
+
+- asgiref==3.3.1
+- Django==3.1.5
+- django-allauth==0.44.0
+- oauthlib==3.1.0
+- PyJWT==2.0.1
+- python3-openid==3.2.0
+- pytz==2020.5
+- requests-oauthlib==1.3.0
+- sqlparse==0.4.1
+
+### Set up Templates
+
+``` mkdir templates ```
+
+``` mkdir templates/allauth```
+
 
 
 ## Gitpod Reminders
@@ -96,16 +224,4 @@ We continually tweak and adjust this template to help give you the best experien
 
 **October 08 2020:** Additional large Gitpod files (`core.mongo*` and `core.python*`) are now hidden in the Explorer, and have been added to the `.gitignore` by default.
 
-**September 22 2020:** Gitpod occasionally creates large `core.Microsoft` files. These are now hidden in the Explorer. A `.gitignore` file has been created to make sure these files will not be committed, along with other common files.
 
-**April 16 2020:** The template now automatically installs MySQL instead of relying on the Gitpod MySQL image. The message about a Python linter not being installed has been dealt with, and the set-up files are now hidden in the Gitpod file explorer.
-
-**April 13 2020:** Added the _Prettier_ code beautifier extension instead of the code formatter built-in to Gitpod.
-
-**February 2020:** The initialisation files now _do not_ auto-delete. They will remain in your project. You can safely ignore them. They just make sure that your workspace is configured correctly each time you open it. It will also prevent the Gitpod configuration popup from appearing.
-
-**December 2019:** Added Eventyret's Bootstrap 4 extension. Type `!bscdn` in a HTML file to add the Bootstrap boilerplate. Check out the <a href="https://github.com/Eventyret/vscode-bcdn" target="_blank">README.md file at the official repo</a> for more options.
-
---------
-
-Happy coding!
