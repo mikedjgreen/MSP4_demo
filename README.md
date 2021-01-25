@@ -196,6 +196,71 @@ Add an email address and tick verify.
 
 ``` mkdir templates/allauth```
 
+### git
+
+``` git add .```
+
+``` git commit -m "Setup allauth" ```
+
+``` git push ```
+
+## Base Templates
+
+At some point we will want to customise the allauth templates within our templates\allauth directory.
+
+pip3 installs files such as allauth in the site-packages directories.
+
+```pwd   returns /workspace/MSP4_demo```
+
+This is also env $THEIA_WORKSPACE_ROOT
+
+
+```cd ..```
+
+```ls -la  ```
+
+returns 
+>
+- drwxr-xr-x 2 gitpod gitpod 4096 Jan 25 12:45 .gitpod
+- -drwxr-x--- 6 gitpod gitpod 4096 Jan 24 16:42 MSP4_demo
+-d rwxr-x--- 6 gitpod gitpod 4096 Jan 25 12:45 mysql
+- drwxr-xr-x 4 gitpod gitpod 4096 Jan 23 16:41 .pip-modules
+>
+
+```cd .pip-modules```
+```cd lib```
+```cd python3.8```
+```cd site-packages```
+```ls -la```
+returns
+
+>
+- drwxr-xr-x  8 gitpod gitpod 4096 Jan 23 17:28 openid
+- drwxr-xr-x  2 gitpod gitpod 4096 Jan 23 17:28 PyJWT-2.0.1.dist-info
+- drwxr-xr-x  2 gitpod gitpod 4096 Jan 23 17:28 python3_openid-3.2.0.dist-info
+- drwxr-xr-x  4 gitpod gitpod 4096 Jan 23 16:41 pytz
+- drwxr-xr-x  2 gitpod gitpod 4096 Jan 23 16:41 pytz-2020.5.dist-info
+- drwxr-xr-x  4 gitpod gitpod 4096 Jan 23 17:28 requests_oauthlib
+- drwxr-xr-x  2 gitpod gitpod 4096 Jan 23 17:28 requests_oauthlib-1.3.0.dist-info
+- drwxr-xr-x  5 gitpod gitpod 4096 Jan 23 16:41 sqlparse
+- drwxr-xr-x  2 gitpod gitpod 4096 Jan 23 16:41 sqlparse-0.4.1.dist-info
+>
+
+**but no allauth/templates directory as course vid states ????**
+
+- From Slack: [allauth source](https://github.com/pennersr/django-allauth)
+
+### Create base.html in /templates
+
+Getting most of the boilerplate from bootstrap.
+
+- [Bootstrap](https://getbootstrap.com/)
+
+Copy [starter template](https://getbootstrap.com/docs/4.4/getting-started/introduction/#starter-template) from bootstrap's docs page onto base.html.
+
+Adding {% blocks %} as needed.
+
+
 
 
 ## Gitpod Reminders
