@@ -260,8 +260,126 @@ Copy [starter template](https://getbootstrap.com/docs/4.4/getting-started/introd
 
 Adding {% blocks %} as needed.
 
+### Create home app.
+
+```python3 manage.py startapp home```
+
+- ![startapp home](/boutique_ado/static/docs/startapp_home.jpg)
+
+```mkdir home/templates```
+
+```mkdir home/templates/home```
+
+```touch home/templates/home/index.html``` 
+
+#### index.html
+
+```
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <h1 class="display-4 text-success">It works!</h1>
+{% endblock %}
+```
+
+#### home/views.py
+
+```
+from django.shortcuts import render
+
+# Create your views here.
+
+def index(request):
+    """ A view to return the index page """
+
+    return render(request, 'home/index.html')
+```
+
+#### home/urls.py
+
+Create file (startapp does not create it).
+
+```
+from django.contrib import admin
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.index, name='home')
+]
+```
 
 
+#### project level boutique_ado/urls.py
+
+Add the line:
+``` path('', include('home.urls')),```
+
+#### project level boutique_ado/settings.py
+
+```
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'home'
+]
+```
+
+#### Wire up templates directory to settings.py
+
+```
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'templates', 'allauth'),
+        ],
+```
+
+#### runserver error
+
+``` python3 manage.py runserver ```
+gives:
+
+```TemplateDoesNotExist at /```
+
+In your settings.py, the template directory should be relative to root dir. Replace this line:
+
+```
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+```
+
+...with:
+
+```
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': ['templates'],
+```
+
+..Or:
+
+```
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+            os.path.join(BASE_DIR, 'templates', 'allauth'),
+        ],
+```
 
 ## Gitpod Reminders
 
