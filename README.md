@@ -381,6 +381,9 @@ TEMPLATES = [
         ],
 ```
 
+#### JSON formatter
+- [JSON formatter](https://jsonformatter.org/)
+
 ## Gitpod Reminders
 
 To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
