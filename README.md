@@ -384,6 +384,22 @@ TEMPLATES = [
 #### JSON formatter
 - [JSON formatter](https://jsonformatter.org/)
 
+
+### Fixtures
+
+```
+gitpod /workspace/MSP4_demo $ python3 manage.py loaddata categories
+BASE_DIR: /workspace/MSP4_demo
+2 BASE_DIR: /workspace/MSP4_demo/boutique_ado
+/workspace/MSP4_demo/boutique_ado/media
+Installed 9 object(s) from 1 fixture(s)
+gitpod /workspace/MSP4_demo $ python3 manage.py loaddata products
+BASE_DIR: /workspace/MSP4_demo
+2 BASE_DIR: /workspace/MSP4_demo/boutique_ado
+/workspace/MSP4_demo/boutique_ado/media
+Installed 172 object(s) from 1 fixture(s)
+```
+
 ## Gitpod Reminders
 
 To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:

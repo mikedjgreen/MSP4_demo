@@ -17,9 +17,9 @@ from pathlib import Path
 # BASE_DIR = Path(__file__).resolve().parent.parent
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-print("BASE_DIR:" ,BASE_DIR)
+print("BASE_DIR:", BASE_DIR)
 BASE_DIR2 = BASE_DIR + "/boutique_ado"
-print("2 BASE_DIR:" , BASE_DIR2)
+print("2 BASE_DIR:", BASE_DIR2)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'home',
+    'products',
 ]
 
 MIDDLEWARE = [
