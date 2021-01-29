@@ -400,6 +400,43 @@ BASE_DIR: /workspace/MSP4_demo
 Installed 172 object(s) from 1 fixture(s)
 ```
 
+### Customise Products admin
+
+#### products/models.py
+
+```
+class Category(models.Model):
+
+    class Meta:
+        verbose_name_plural = 'Categories'
+```
+
+#### products/admin.py
+
+2 new classes: 
+1) class ProductAdmin(admin.ModelAdmin)
+
+```
+class ProductAdmin(admin.ModelAdmin):
+    list_display = (
+        'sku',
+        'name',
+        'category',
+        'price',
+        'rating',
+        'image',
+    )
+
+    ordering = ('sku',)
+```
+2) class CategoryAdmin(admin.ModelAdmin)
+
+```
+    list_display = (
+        'friendly_name',
+        'name',
+    )
+```
 ## Gitpod Reminders
 
 To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
