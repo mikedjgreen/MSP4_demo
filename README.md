@@ -449,6 +449,8 @@ Products/products.html
 
 #### Queries
 
+See Django [query documentation.](https://docs.djangoproject.com/en/3.1/topics/db/queries/).
+
 In products/views.py:
 
 ```
@@ -477,6 +479,26 @@ query = None
     }
 ```
 
+####  Specific categories of products
+
+includes/main-nav.html:
+
+```
+    <a href="{% url 'products' %}?category=activewear,essentials" class="dropdown-item">Activewear &amp; Essentials</a>
+    <a href="{% url 'products' %}?category=jeans" class="dropdown-item">Jeans</a>
+    <a href="{% url 'products' %}?category=shirts" class="dropdown-item">Shirts</a>
+    <a href="{% url 'products' %}?category=activewear,essentials,jeans,shirts" class="dropdown-item">All Clothing</a>
+```
+
+products/views.py:
+
+```
+ if 'category' in request.GET:
+            categories = request.GET['category'].split(',')
+            products = products.filter(category__name__in=categories)
+            categories = Category.objects.filter(name__in=categories)
+
+```
 
 ## Gitpod Reminders
 
