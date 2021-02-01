@@ -437,6 +437,47 @@ class ProductAdmin(admin.ModelAdmin):
         'name',
     )
 ```
+
+### Set up Product views
+
+Products/views.py
+
+Products/products.html
+
+
+```[../boutique_ado$] mkdir -p products/templates/products ```
+
+#### Queries
+
+In products/views.py:
+
+```
+from django.shortcuts import render, redirect, reverse, get_object_or_404
+from .models import Product
+from django.contrib import messages
+from django.db.models import Q
+```
+Further down the code:
+``` 
+query = None  
+
+    if request.GET:
+        if 'q' in request.GET:
+            query = request.GET['q']
+            if not query:
+                messages.error(request, "You didn't enter any search criteria!")
+                return redirect(reverse('products'))
+            
+            queries = Q(name__icontains=query) | Q(description__icontains=query)
+            products = products.filter(queries)
+
+    context = {
+        'products': products,
+        'search_term': query,
+    }
+```
+
+
 ## Gitpod Reminders
 
 To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
