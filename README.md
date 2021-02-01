@@ -500,6 +500,41 @@ products/views.py:
 
 ```
 
+#### Sorting
+
+products/views.py:
+
+```
+    sort = None
+    direction = None
+```
+further down:
+
+```
+        if 'sort' in request.GET:
+            sortkey = request.GET['sort']
+            sort = sortkey
+            if sortkey == 'name':
+                sortkey = 'lower_name'
+                products = products.annotate(lower_name=Lower('name'))
+
+            if 'direction' in request.GET:
+                direction = request.GET['direction']
+                if direction == 'desc':
+                    sortkey = f'-{sortkey}'
+            products = products.order_by(sortkey)
+
+```
+
+includes/main-nav.html:
+
+```
+    <a href="{% url 'products' %}?sort=price&direction=asc" class="dropdown-item">By Price</a>
+    <a href="{% url 'products' %}?sort=rating&direction=desc" class="dropdown-item ">By Rating</a>
+    <a href="{% url 'products' %}?sort=category&direction=asc" class="dropdown-item ">By Category</a>
+```
+
+
 ## Gitpod Reminders
 
 To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
