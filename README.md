@@ -533,6 +533,60 @@ includes/main-nav.html:
     <a href="{% url 'products' %}?sort=rating&direction=desc" class="dropdown-item ">By Rating</a>
     <a href="{% url 'products' %}?sort=category&direction=asc" class="dropdown-item ">By Category</a>
 ```
+### Shopping Bag
+
+1) Creating new app called bag.
+
+``` python3 manage.py startapp bag ```
+
+2) Adding app to settings.py, 'INSTALLED_APPS'.
+
+3) Creating bag/views.py (using home/views.py as template):
+```
+from django.shortcuts import render
+
+# Create your views here.
+
+def view_bag(request):
+    """ A view that renders the bag contents page """
+
+    return render(request, 'bag/bag.html')
+```
+
+4) Creating '/workspace/MSP4_demo/bag/templates/bag' directory.
+
+5) Create 'bag.html' within templates/bag diretory, using home/index.html.
+
+6) Create bag/urls.py using home/urls.py as template.
+```
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.view_bag, name='view_bag')
+]
+```
+
+7) Include bag urls in project level boutique_ado/urls.py
+
+```
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('accounts/', include('allauth.urls')),
+    path('', include('home.urls')),
+    path('products/', include('products.urls')),
+    path('bag/', include('bag.urls')),
+```
+
+
+8) base.html add link to bag.
+```
+ <a class="{% if grand_total %}text-info font-weight-bold{% else %}text-black{% endif %} nav-link" href="{% url 'view_bag' %}">
+```
+
+9) add link to mobile version of top header,  templates/includes/mobile-top-header.html.
+
+"{% url 'view_bag' %}"
 
 
 ## Gitpod Reminders
