@@ -589,6 +589,53 @@ urlpatterns = [
 "{% url 'view_bag' %}"
 
 
+### Context Processors
+
+This will return a dictionary called context that keeps track of the contents of the shopping bag.
+This can be viewed by all apps.
+
+1) Create bag/contexts.py
+
+Within this will be a function called bag_contents.
+```
+
+from decimal import Decimal
+from django.conf import settings
+
+def bag_contents(request):
+
+    bag_items = []
+    total = 0
+    product_count = 0
+
+    if total < settings.FREE_DELIVERY_THRESHOLD:
+        delivery = total * Decimal(settings.STANDARD_DELIVERY_PERCENTAGE / 100)
+        free_delivery_delta = settings.FREE_DELIVERY_THRESHOLD - total
+    else:
+        delivery = 0
+        free_delivery_delta = 0
+    
+    grand_total = delivery + total
+    
+    context = {
+        'bag_items': bag_items,
+        'total': total,
+        'product_count': product_count,
+        'delivery': delivery,
+        'free_delivery_delta': free_delivery_delta,
+        'free_delivery_threshold': settings.FREE_DELIVERY_THRESHOLD,
+        'grand_total': grand_total,
+    }
+
+    return context
+```
+
+2) To make contexts.py available to all, need to add to settings.py
+``` 'context_processors': [ ```
+
+``` 'bag.contexts.bag_contents',  # for shopping bag ```
+
+
 ## Gitpod Reminders
 
 To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
