@@ -1,3 +1,50 @@
+- [Install Django](#install-django)
+    + [.gitignore](#gitignore)
+    + [run initial migrations](#run-initial-migrations)
+    + [create superuser](#create-superuser)
+    + [First commit to github](#first-commit-to-github)
+- [Authentication system](#authentication-system)
+  * [settings.py](#settingspy)
+  * [urls.py](#urlspy)
+  * [Added new apps, need to migrate](#added-new-apps--need-to-migrate)
+  * [Runserver, with admin](#runserver--with-admin)
+  * [Additional settings.py](#additional-settingspy)
+    + [With 'allauth' working, need to set up requirements.txt.](#with--allauth--working--need-to-set-up-requirementstxt)
+  * [Set up Templates](#set-up-templates)
+  * [git](#git)
+- [Base Templates](#base-templates)
+  * [Create base.html in /templates](#create-basehtml-in--templates)
+  * [Create home app.](#create-home-app)
+    + [index.html](#indexhtml)
+    + [home/views.py](#home-viewspy)
+    + [home/urls.py](#home-urlspy)
+    + [project level boutique_ado/urls.py](#project-level-boutique-ado-urlspy)
+    + [project level boutique_ado/settings.py](#project-level-boutique-ado-settingspy)
+    + [Wire up templates directory to settings.py](#wire-up-templates-directory-to-settingspy)
+    + [runserver error](#runserver-error)
+    + [JSON formatter](#json-formatter)
+  * [Fixtures](#fixtures)
+  * [Customise Products admin](#customise-products-admin)
+    + [products/models.py](#products-modelspy)
+    + [products/admin.py](#products-adminpy)
+  * [Set up Product views](#set-up-product-views)
+    + [Queries](#queries)
+    + [Specific categories of products](#specific-categories-of-products)
+    + [Sorting](#sorting)
+  * [Shopping Bag](#shopping-bag)
+  * [Context Processors](#context-processors)
+    + [Adding products to shopping bag](#adding-products-to-shopping-bag)
+  * [Toasts](#toasts)
+  * [checkout app and STRIPE](#checkout-app-and-stripe)
+    + [models](#models)
+    + [signals](#signals)
+    + [checkout form](#checkout-form)
+- [Gitpod Reminders](#gitpod-reminders)
+- [Updates Since The Instructional Video](#updates-since-the-instructional-video)
+
+
+<small><i>[TOC](http://ecotrust-canada.github.io/markdown-toc/)</i></small>
+
 ![CI logo](https://codeinstitute.s3.amazonaws.com/fullstack/ci_logo_small.png)
 
 Welcome Mike Green,
@@ -634,6 +681,40 @@ def bag_contents(request):
 ``` 'context_processors': [ ```
 
 ``` 'bag.contexts.bag_contents',  # for shopping bag ```
+
+
+#### Adding products to shopping bag
+
+
+### Toasts 
+
+### checkout app and STRIPE 
+
+``` python3 manage.py startapp checkout```
+
+settings.py :
+
+```
+INSTALLED_APPS [
+...
+    'bag',
+    'checkout',
+]
+```
+
+#### models 
+
+checkout/models.py :
+
+#### signals 
+
+checkout/signals.py :
+
+#### checkout form 
+
+
+
+
 
 
 ## Gitpod Reminders
