@@ -1,0 +1,35 @@
+[
+  {
+    "pk": 1,
+    "model": "members.Member",
+    "fields": {
+      "full_name": "Mike Green",
+      "email": "m.d.j.green@ntlworld.com",
+      "created": "2021-02-12 11:58",
+      "bio": "Founder, working mainly on charcoal drawings",
+      "admin_id": 1
+    }
+  },
+  {
+    "pk": 2,
+    "model": "members.Member",
+    "fields": {
+      "full_name": "Tabatha Corkingdale-Smuff",
+      "email": "tcs@anywhere.com",
+      "created": "2021-02-12 15:10",
+      "bio": "Abstracted expression",
+      "admin_id": 0
+    }
+  },
+  {
+    "pk": 3,
+    "model": "members.Member",
+    "fields": {
+      "full_name": "Tamara Crutchley-Smythe",
+      "email": "tcs@nowhere.com",
+      "created": "2021-02-12 15:12",
+      "bio": "Extruded concretions",
+      "admin_id": 0
+    }
+  }
+]

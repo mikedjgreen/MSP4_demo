@@ -432,6 +432,59 @@ TEMPLATES = [
 - [JSON formatter](https://jsonformatter.org/)
 
 
+## members
+
+```python3 manage.py startapp members```
+
+```cd members```
+
+```mkdir fixtures```
+
+```cd fixtures```
+
+```touch members.json```
+
+### fixtures/members.json
+```
+[
+  {
+    "pk": 1,
+    "model": "members.Member",
+    "fields": {
+      "full_name": "Mike Green",
+      "email": "m.d.j.green@ntlworld.com",
+      "created": "2021-02-12 11:58",
+      "bio": "Founder, working mainly on charcoal drawings",
+      "admin_id": 1
+    }
+  }
+]
+```
+
+### Loading member json fixture
+
+```cd ../..```
+
+```python3 manage.py makemigrations --dry-run```
+
+```python3 manage.py makemigration```
+
+```python3 manage.py migrate --plan```
+
+```python3 manage.py migrate```
+
+```python3 manage.py loaddata members```
+
+
+```
+BASE_DIR: /workspace/MSP4_demo
+2 BASE_DIR: /workspace/MSP4_demo/boutique_ado
+/workspace/.pip-modules/lib/python3.8/site-packages/django/db/models/fields/__init__.py:1367: RuntimeWarning: DateTimeField Member.created received a naive datetime (2021-02-12 11:58:00) while time zone support is active.
+  warnings.warn("DateTimeField %s received a naive datetime (%s)"
+Installed 1 object(s) from 1 fixture(s)
+```
+
+
 ### Fixtures
 
 ```

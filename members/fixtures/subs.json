@@ -1,0 +1,12 @@
+[
+    {
+        "pk" : 1,
+        "model" : "members.Subs",
+        "fields" : {
+            "year" : 2021,
+            "member_id" : 1,
+            "rate" : 10.50,
+            "order_id" : 0
+        }
+    }
+]
