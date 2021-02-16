@@ -51,6 +51,38 @@ Welcome Mike Green,
 
 This is the Code Institute student template for Gitpod. We have preinstalled all of the tools you need to get started. You can safely delete this README.md file, or change it for your own project. Please do read it at least once, though! It contains some important information about Gitpod and the extensions we use.
 
+## boutique_ado demo project
+
+### user stories
+
+story id | As a | I want to be able to | So that I can
+---------|------|----------------------|--------------
+1.      |Shopper|View a list of products| Select some to purchase
+2.      |Shopper|View individual product details|Price, description, rating and available sizes
+3.      |Shopper|Identify deals, special offers and clearances|Take advantage of special savings
+4.      |Shopper|Easily view the total of my purchases at any time|Avoid spending too much
+5.      |Site user|Easily register for an account|Have a personal account and view my profile
+6.      |Site user|Easily login or out|
+7.      |Site user|Easily recover my password if I forget it|Recover access to my account
+8.      |Site user|Recieve an email confirmation of registration|Verify that my account registration was successful
+9.      |Site user|Have a personalised view profile|View order history
+10.     |Shopper|Sort the list of available products|By rate,price,category
+11.     |Shopper|Sort a specific category of product|
+12.     |Shopper|Sort multiple categories simultaneously|
+13.     |Shopper|Search for a product by name or description|
+14.     |Shopper|Easily see what I've searched for and the number of results|
+15.     |Shopper| Easily select the size and quantity of a product when purchasing it|Ensure I don't accidentily select the wrong product, size or quantity                 
+16. |Shopper|View items in my bag to be purchased |
+17. |Shopper|Adjust the quantity of individula items in my bag|
+18. |Shopper|Easily enter my payment information|Checkout quickly, with no hassles
+19. |Shopper|Personal and payment info is safe and secure|Confidently provide the info to make a purchase
+20. |Shopper|View an order confirmation after checkout| Verify I haven't made mistakes
+21. |Shopper|Receive an email confirmation after checkout| 
+22. |Store Owner|Add a product|
+23. |Store Owner|Edit/update product|
+24. |Store Owner| Delete a product|Remove item that is no longer for sale.
+
+
 ## Install Django
 
 ```pip3 install django```
@@ -329,6 +361,113 @@ Adding {% blocks %} as needed.
     <h1 class="display-4 text-success">It works!</h1>
 {% endblock %}
 ```
+
+[bootstrap](https://getbootstrap.com/docs/5.0/getting-started/introduction/):  my-auto to vertically centre contents.
+[bootstrap stackoverflow](https://stackoverflow.com/questions/tagged/bootstrap-5)
+
+### Also need CSS to format page
+
+```mkdir static```
+```mkdir media```
+``` cd static```
+```mkdir css```
+```cd css```
+```touch base.css```
+#### Base.css as used by CI for Boutique_Ado :
+```
+html {
+    height: 100%;
+}
+
+body {
+    background: url('/media/homepage_background_cropped.jpg') no-repeat center center fixed;
+    background-size: cover;
+    height: calc(100vh - 164px);
+    color: #555;
+    font-family: 'Lato';
+}
+
+/* from Bulma */
+.icon {
+    align-items: center;
+    display: inline-flex;
+    justify-content: center;
+    height: 1.5rem;
+    width: 1.5rem;
+}
+
+.logo-font {
+    text-transform: uppercase;
+}
+
+.main-logo-link {
+    width: fit-content;
+}
+
+.shop-now-button {
+    background: black;
+    color: white;
+    min-width: 260px;
+}
+
+.btn-black {
+    background: black;
+    color: white;
+}
+
+.shop-now-button:hover,
+.shop-now-button:active,
+.shop-now-button:focus,
+.btn-black:hover,
+.btn-black:active,
+.btn-black:focus {
+    background: #222;
+    color: white;
+}
+
+.text-black {
+    color: #000 !important;
+}
+
+.border-black {
+    border: 1px solid black !important;
+}
+
+/* -------------------------------- Media Queries */
+
+/* Slightly larger container on xl screens */
+@media (min-width: 1200px) {
+  .container {
+    max-width: 80%;
+  }
+}
+
+/* fixed top navbar only on medium and up */
+@media (min-width: 992px) {
+    .fixed-top-desktop-only {
+        position: fixed;
+        top: 0;
+        right: 0;
+        left: 0;
+        z-index: 1030;
+    }
+
+    .header-container {
+        padding-top: 164px;
+    }
+}
+```
+
+#### Font Awesome
+
+In corejs block put in the kitcode script found within fontawsome:
+
+```
+    {% block corejs %}
+        <script src="https://kit.fontawesome.com/169cf7da54.js" crossorigin="anonymous"></script>
+```
+
+
 
 #### home/views.py
 
@@ -655,7 +794,7 @@ def view_bag(request):
 
 4) Creating '/workspace/MSP4_demo/bag/templates/bag' directory.
 
-5) Create 'bag.html' within templates/bag diretory, using home/index.html.
+5) Create 'bag.html' within templates/bag directory, using home/index.html.
 
 6) Create bag/urls.py using home/urls.py as template.
 ```
@@ -737,9 +876,247 @@ def bag_contents(request):
 
 
 #### Adding products to shopping bag
+To add items to shopping bag:
+1. write new view in the bag app
+2. Make some changes to the context processor
+3. Make changes to the product model
+4. Make changes to the product detail template.
+
+#### Form to add items within product detail template.
+Method="POST"
+Needs ``` {% csrf_token %} ```
+Form allows a quantity and product_id to be submitted to the bag.
+
+#### bag/add_to_bag in views.html
+
+Request-response cycle: the Django server side needs to communicate with the form on the client side.
+This is done by a session [request.session.get]. This will be a temporary store to hold a user's (browser's) product-id/quantity entries from the form before server-side updates.
+```
+def add_to_bag(request, item_id):
+    """ Add a quantity of the specified product to the shopping bag """
+
+    quantity = int(request.POST.get('quantity'))
+    redirect_url = request.POST.get('redirect_url')
+    bag = request.session.get('bag', {})
+
+    if item_id in list(bag.keys()):
+        bag[item_id] += quantity
+    else:
+        bag[item_id] = quantity
+
+    request.session['bag'] = bag
+    print(request.session['bag'])
+    return redirect(redirect_url)
+    
+```
+
+#### create a url for the view's 'add_to_bag'
+```
+urlpatterns = [
+    path('', views.view_bag, name='view_bag'),
+    **path('add/<item_id>/', views.add_to_bag, name='add_to_bag'),**
+]
+```
+
+#### product_detail form
+```
+ <form class="form" action="{% url 'add_to_bag' product.id %}" method="POST">
+```
+
+#### update custom context processor
+To make the shopping bag's contents available across the site.
+
+Session variable called bag.
+bag/context.py :
+```
+from django.shortcuts import get_object_or_404
+from products.models import Product
+```
+...
+
+```
+ bag = request.session.get('bag', {})
+
+    for item_id, quantity in bag.items():
+        product = get_object_or_404(Product, pk=item_id)
+        total += quantity * product.price
+        product_count += quantity
+        bag_items.append({
+            'item_id': item_id,
+            'quantity': quantity,
+            'product': product,
+        })
+
+```
+
+#### bag/bag.html
+```
+  <td colspan="5" class="text-right">
+   **<a href="{% url 'products' %}" class="btn btn-outline-black rounded-0 btn-lg">**
+        <span class="icon">
+        <i class="fas fa-chevron-left"></i>
+        </span>
+        <span class="text-uppercase">Keep Shopping</span>
+```
+
+### Shell command
+Allows us to use the CLI to run python commands against our app, configured by settings.py.
+
+```python3 manage.py shell```
+
+We've added a new field to the Products model, and want to update current products to a default value.
+
+```
+from products.model import Product
+kdbb = ['kitchen_dining','bed_bath']
+clothes = Product.object.exclude(category_name_in=kdbb)
+clothes.count()
+for item in clothes:
+    item.has_sizes = True
+    item.save()
+
+exit()
+```
+
+Django docs, look up :  creating custom template tags and filters.
+Used this to fix subtotals.
+
+### Bootstrap Toasts 
+
+[Bootstrap toasts documentation](https://getbootstrap.com/docs/4.3/components/toasts/)
+
+Realtime notifications.
+
+```cd templates/includes;mkdir toasts```
+... html snippets...
+```cd toasts;touch toast_success.html
+touch toast-error.html
+touch toast-info.html
+touch toast-warning.html
+```
+
+Once snippets filled in, want  to attach to base.html.
+
+#### Django messages (import django.contrib.messages) have levels.
+Which are classifiers such as:
+Level Constant|	Value
+--------------|------
+DEBUG	|10
+INFO	|20
+SUCCESS	|25
+WARNING	|30
+ERROR	|40
+
+#### In templates/base.html need to plug these toast messages in.
+
+```
+    {% if messages %}
+        <div class="message-container">
+            {% for message in messages %}
+                {% with message.level as level %}
+                    {% if level == 40 %}
+                        {% include 'includes/toasts/toast_error.html' %}
+                    {% elif level == 30 %}
+                        {% include 'includes/toasts/toast_warning.html' %}
+                    {% elif level == 25 %}
+                        {% include 'includes/toasts/toast_success.html' %}
+                    {% else %}
+                        {% include 'includes/toasts/toast_info.html' %}
+                    {% endif %}
+                {% endwith %}
+            {% endfor %}
+        </div>
+    {% endif %}
+```
 
 
-### Toasts 
+#### Styling the toasts within base.css.
+```
+/* ------------------------------- bootstrap toasts */
+
+.message-container {
+    position: fixed;
+    top: 72px;
+    right: 15px;
+    z-index: 99999999999; /* ensure toasts are on top */
+}
+
+.custom-toast {
+    overflow: visible;
+}
+
+.toast-capper {
+    height: 2px;
+}
+```
+
+
+#### settings.py:
+``` MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage' ```
+
+#### bag/views.py:
+```from django.contrib import messages```
+...
+``` 
+    messages.success(request, f'Added {product.name} to your bag')
+```
+
+Now to build on the toast templates to give more information on shopping bag to the users as they shop.
+[css tricks](https://css-tricks.com/)
+
+```
+/* from CSS-tricks.com: https://css-tricks.com/snippets/css/css-triangle/ */
+.arrow-up {
+    width: 0; 
+    height: 0; 
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent; 
+    border-bottom: 10px solid black;
+    position: absolute;
+    top: -10px;
+    right: 36px;
+}
+
+/* Convenience classes - colors copied from Bootstrap */
+.arrow-primary {
+    border-bottom-color: #007bff !important;
+}
+
+.arrow-secondary {
+    border-bottom-color: #6c757d !important;
+}
+
+.arrow-success {
+    border-bottom-color: #28a745 !important;
+}
+
+.arrow-danger {
+    border-bottom-color: #dc3545 !important;
+}
+
+.arrow-warning {
+    border-bottom-color: #ffc107 !important;
+}
+
+.arrow-info {
+    border-bottom-color: #17a2b8 !important;
+}
+
+.arrow-light {
+    border-bottom-color: #f8f9fa !important;
+}
+
+.arrow-dark {
+    border-bottom-color: #343a40 !important;
+}
+
+.bag-notification-wrapper {
+    height: 100px;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+```
+
 
 ### checkout app and STRIPE 
 
@@ -758,6 +1135,8 @@ INSTALLED_APPS [
 #### models 
 
 checkout/models.py :
+
+Create a class called order.
 
 #### signals 
 

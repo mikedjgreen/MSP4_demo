@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, reverse, get_object_or_404
-from .models import Product, Category
+from .models import Product, Category, Artworks
 from django.contrib import messages
 from django.db.models import Q
 from django.db.models.functions import Lower
@@ -66,3 +66,14 @@ def product_detail(request, product_id):
     }
 
     return render(request, 'products/product_detail.html', context)
+
+
+def all_artworks(request):
+    """ A view to show all artworks """
+    artworks = Artworks.objects.all()
+
+    context = {
+        'artworks': artworks,
+    }
+
+    return render(request, 'products/artworks.html', context)
