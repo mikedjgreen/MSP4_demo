@@ -1134,17 +1134,201 @@ INSTALLED_APPS [
 
 #### models 
 
-checkout/models.py :
-
 Create a class called order.
+checkout/models.py :
+```
+import uuid
+
+from django.db import models
+from django.db.models import Sum
+from django.conf import settings
+
+from products.models import Product
+
+
+class Order(models.Model):
+    order_number = models.CharField(max_length=32, null=False, editable=False)
+    full_name = models.CharField(max_length=50, null=False, blank=False)
+    email = models.EmailField(max_length=254, null=False, blank=False)
+    phone_number = models.CharField(max_length=20, null=False, blank=False)
+    country = models.CharField(max_length=40, null=False, blank=False)
+    postcode = models.CharField(max_length=20, null=True, blank=True)
+    town_or_city = models.CharField(max_length=40, null=False, blank=False)
+    street_address1 = models.CharField(max_length=80, null=False, blank=False)
+    street_address2 = models.CharField(max_length=80, null=True, blank=True)
+    county = models.CharField(max_length=80, null=True, blank=True)
+    date = models.DateTimeField(auto_now_add=True)
+    delivery_cost = models.DecimalField(max_digits=6, decimal_places=2, null=False, default=0)
+    order_total = models.DecimalField(max_digits=10, decimal_places=2, null=False, default=0)
+    grand_total = models.DecimalField(max_digits=10, decimal_places=2, null=False, default=0)
+
+    def _generate_order_number(self):
+        """
+        Generate a random, unique order number using UUID
+        """
+        return uuid.uuid4().hex.upper()
+
+    def update_total(self):
+        """
+        Update grand total each time a line item is added,
+        accounting for delivery costs.
+        """
+        self.order_total = self.lineitems.aggregate(Sum('lineitem_total'))['lineitem_total__sum']
+        if self.order_total < settings.FREE_DELIVERY_THRESHOLD:
+            self.delivery_cost = self.order_total * settings.STANDARD_DELIVERY_PERCENTAGE / 100
+        else:
+            self.delivery_cost = 0
+        self.grand_total = self.order_total + self.delivery_cost
+        self.save()
+
+    def save(self, *args, **kwargs):
+        """
+        Override the original save method to set the order number
+        if it hasn't been set already.
+        """
+        if not self.order_number:
+            self.order_number = self._generate_order_number()
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return self.order_number
+
+
+class OrderLineItem(models.Model):
+    order = models.ForeignKey(Order, null=False, blank=False, on_delete=models.CASCADE, related_name='lineitems')
+    product = models.ForeignKey(Product, null=False, blank=False, on_delete=models.CASCADE)
+    product_size = models.CharField(max_length=2, null=True, blank=True) # XS, S, M, L, XL
+    quantity = models.IntegerField(null=False, blank=False, default=0)
+    lineitem_total = models.DecimalField(max_digits=6, decimal_places=2, null=False, blank=False, editable=False)
+
+    def save(self, *args, **kwargs):
+        """
+        Override the original save method to set the lineitem total
+        and update the order total.
+        """
+        self.lineitem_total = self.product.price * self.quantity
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f'SKU {self.product.sku} on order {self.order.order_number}'
+```
+
+#### checkout/admin.py
+
+```
+from django.contrib import admin
+from .models import Order, OrderLineItem
+
+
+class OrderLineItemAdminInline(admin.TabularInline):
+    model = OrderLineItem
+    readonly_fields = ('lineitem_total',)
+
+
+class OrderAdmin(admin.ModelAdmin):
+    inlines = (OrderLineItemAdminInline,)
+
+    readonly_fields = ('order_number', 'date',
+                       'delivery_cost', 'order_total',
+                       'grand_total',)
+
+    fields = ('order_number', 'date', 'full_name',
+              'email', 'phone_number', 'country',
+              'postcode', 'town_or_city', 'street_address1',
+              'street_address2', 'county', 'delivery_cost',
+              'order_total', 'grand_total',)
+
+    list_display = ('order_number', 'date', 'full_name',
+                    'order_total', 'delivery_cost',
+                    'grand_total',)
+
+    ordering = ('-date',)
+
+admin.site.register(Order, OrderAdmin)
+```
+
+    
 
 #### signals 
 
+We need a method to call a total order method each time a line order is created.
+This is done by signals.
+
+
 checkout/signals.py :
+
+```
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+from .models import OrderLineItem
+
+@receiver(post_save, sender=OrderLineItem)
+def update_on_save(sender, instance, created, **kwargs):
+    """
+    Update order total on lineitem update/create
+    """
+    instance.order.update_total()
+
+@receiver(post_delete, sender=OrderLineItem)
+def update_on_save(sender, instance, **kwargs):
+    """
+    Update order total on lineitem delete
+    """
+    instance.order.update_total()
+```    
+
+checkout/apps.py:
+```
+    def ready(self):
+        import checkout.signals
+```    
+
 
 #### checkout form 
 
+checkout/forms.py :
+```
+from django import forms
+from .models import Order
 
+
+class OrderForm(forms.ModelForm):
+    class Meta:
+        model = Order
+        fields = ('full_name', 'email', 'phone_number',
+                  'street_address1', 'street_address2',
+                  'town_or_city', 'postcode', 'country',
+                  'county',)
+
+    def __init__(self, *args, **kwargs):
+        """
+        Add placeholders and classes, remove auto-generated
+        labels and set autofocus on first field
+        """
+        super().__init__(*args, **kwargs)
+        placeholders = {
+            'full_name': 'Full Name',
+            'email': 'Email Address',
+            'phone_number': 'Phone Number',
+            'country': 'Country',
+            'postcode': 'Postal Code',
+            'town_or_city': 'Town or City',
+            'street_address1': 'Street Address 1',
+            'street_address2': 'Street Address 2',
+            'county': 'County',
+        }
+
+        self.fields['full_name'].widget.attrs['autofocus'] = True
+        for field in self.fields:
+            if self.fields[field].required:
+                placeholder = f'{placeholders[field]} *'
+            else:
+                placeholder = placeholders[field]
+            self.fields[field].widget.attrs['placeholder'] = placeholder
+            self.fields[field].widget.attrs['class'] = 'stripe-style-input'
+            self.fields[field].label = False
+```
 
 
 
