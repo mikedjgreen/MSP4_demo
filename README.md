@@ -1418,10 +1418,149 @@ urllib3==1.25.7
 
 [STRIPE](https://stripe.com/en-gb) website, 'start now'.
 
+You will need an email address, Full name and a secure password.
+Can use [Tempmail.org](Tempmail.org) to get a temporary email address for testing STRIPE.
+Once verified, you should be presented with a Dashboard:
+![dashboard](boutique_ado/static/docs/STRIPE_dashboard.jpg).
+
+#### STRIPE Elements
 [STRIPE DOCS](https://stripe.com/docs/payments?payments=popular) gives information about STRIPE's elements.
+Using STRIPE elements to add a prebuilt credit card input to our checkout form.
+
+
 
 [SET UP STRIPE](https://stripe.com/docs/payments/accept-a-payment#web-collect-card-details)
 
+#### install the libraries for access to the Stripe API from your application:
+
+```pip3 install --upgrade stripe```
+
+#### add a checkout button:
+
+```<button id="checkout-button">Checkout</button>``
+
+checkout/templates/checkout/checkout.html:
+{% block postloadjs %}
+    {{ block.super }}
+    {{ stripe_public_key|json_script:"id_stripe_public_key" }}
+    {{ client_secret|json_script:"id_client_secret" }}
+    <script src="{% static 'checkout/js/stripe_elements.js' %}"></script>
+{% endblock %}
+
+
+Add STRIPE's API key from the dashboard to checkout view.
+
+checkout/views.py:
+
+    order_form = OrderForm()
+    template = 'checkout/checkout.html'
+    context = {
+        'order_form': order_form,
+        'stripe_public_key': 'pk_test_0SMREd7Vdweb1MGRi8S0EycR00JVzSAs5O',
+        'client_secret': 'test client secret',
+    }
+
+Create a checkout/static/checkout/js folder and a javascript stripe_elements.js :
+```
+/*
+    Core logic/payment flow for this comes from here:
+    https://stripe.com/docs/payments/accept-a-payment
+    CSS from here: 
+    https://stripe.com/docs/stripe-js
+
+    Slicing off quotation marks from API keys from context.
+*/
+
+var stripe_public_key = $('#id_stripe_public_key').text().slice(1, -1);
+var client_secret = $('#id_client_secret').text().slice(1, -1);
+var stripe = Stripe(stripe_public_key);
+var elements = stripe.elements();
+var style = {
+    base: {
+        color: '#000',
+        fontFamily: '"Helvetica Neue", Helvetica, sans-serif',
+        fontSmoothing: 'antialiased',
+        fontSize: '16px',
+        '::placeholder': {
+            color: '#aab7c4'
+        }
+    },
+    invalid: {
+        color: '#dc3545',
+        iconColor: '#dc3545'
+    }
+};
+var card = elements.create('card', {style: style});
+card.mount('#card-element');
+```
+
+Create a checkout/static/checkout/css/checkout.css  file:
+```
+.StripeElement,
+.stripe-style-input {
+  box-sizing: border-box;
+  height: 40px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 0px;
+  background-color: white;
+  box-shadow: 0 1px 3px 0 #e6ebf1;
+  -webkit-transition: box-shadow 150ms ease;
+  transition: box-shadow 150ms ease;
+}
+
+.StripeElement--focus,
+.stripe-style-input:focus,
+.stripe-style-input:active {
+  box-shadow: 0 1px 3px 0 #cfd7df;
+}
+
+.StripeElement--webkit-autofill {
+  background-color: #fefde5 !important;
+}
+
+.stripe-style-input::placeholder {
+    color: #aab7c4;
+}
+
+.fieldset-label {
+    position: relative;
+    right: .5rem;
+}
+
+#payment-form .form-control,
+#card-element {
+    color: #000;
+    border: 1px solid #000;
+}
+```
+
+#### Add an event handler to the checkout button
+
+
+#### Add the Stripe.js library to your page:
+
+templates/base.html:
+
+``` {% block corejs %}
+       <script src="https://js.stripe.com/v3/"></script>
+```
+
+
+
+#### Redirect customer to STRIPE checkout:
+
+Create a Checkout Session.
+
+You also need to specify:
+- A success_url, a page on your website to redirect your customer after they complete the payment.
+- A cancel_url, a page on your website to redirect your customer if they click on your logo in Checkout.
+
+As STRIPE documentation states:
+> Your API keys carry many privileges, 
+> so be sure to keep them secure!
+> Do not share your secret API keys in publicly accessible areas such as
+>  GitHub, client-side code, and so forth.
 
 ## Gitpod Reminders
 
