@@ -1213,6 +1213,34 @@ class OrderLineItem(models.Model):
         return f'SKU {self.product.sku} on order {self.order.order_number}'
 ```
 
+```python3 manage.py makemigrations --dry-run ```
+BASE_DIR: /workspace/MSP4_demo
+2 BASE_DIR: /workspace/MSP4_demo/boutique_ado
+Migrations for 'checkout':
+  checkout/migrations/0001_initial.py
+    - Create model Order
+    - Create model OrderLineItem
+
+``` python3 manage.py makemigrations ```
+Migrations for 'checkout':
+  checkout/migrations/0001_initial.py
+    - Create model Order
+    - Create model OrderLineItem
+
+```python3 manage.py migrate --plan```
+Planned operations:
+checkout.0001_initial
+    Create model Order
+    Create model OrderLineItem
+
+```python3 manage.py migrate```
+Operations to perform:
+  Apply all migrations: account, admin, auth, checkout, contenttypes, members, products, sessions, sites, socialaccount
+Running migrations:
+  Applying checkout.0001_initial... OK
+
+
+
 #### checkout/admin.py
 
 ```
@@ -1329,8 +1357,70 @@ class OrderForm(forms.ModelForm):
             self.fields[field].widget.attrs['class'] = 'stripe-style-input'
             self.fields[field].label = False
 ```
+#### checkout view
+
+crispy forms....
+
+checkout/views.py:
+```
+from django.shortcuts import render, redirect, reverse
+from django.contrib import messages
+
+# Create your views here.
+from .forms import OrderForm
 
 
+def checkout(request):
+    bag = request.session.get('bag', {})
+    if not bag:
+        messages.error(request, "There's nothing in your bag at the moment")
+        return redirect(reverse('products'))
+
+    order_form = OrderForm()
+    template = 'checkout/checkout.html'
+    context = {
+        'order_form': order_form,
+    }
+
+    return render(request, template, context)
+```
+
+checkout/urls.py:
+```
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.checkout, name='checkout')
+]
+```
+
+
+> requirements.txt
+```
+asgiref==3.2.3
+chardet==3.0.4
+Django==3.0.1
+django-allauth==0.41.0
+**django-crispy-forms==1.8.1**
+idna==2.8
+oauthlib==3.1.0
+**Pillow==7.0.0**
+python3-openid==3.1.0
+pytz==2019.3
+requests==2.22.0
+requests-oauthlib==1.3.0
+sqlparse==0.3.0
+urllib3==1.25.7
+```
+
+## STRIPE payments
+
+[STRIPE](https://stripe.com/en-gb) website, 'start now'.
+
+[STRIPE DOCS](https://stripe.com/docs/payments?payments=popular) gives information about STRIPE's elements.
+
+[SET UP STRIPE](https://stripe.com/docs/payments/accept-a-payment#web-collect-card-details)
 
 
 ## Gitpod Reminders
