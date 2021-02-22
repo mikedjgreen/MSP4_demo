@@ -1360,6 +1360,7 @@ class OrderForm(forms.ModelForm):
 #### checkout view
 
 crispy forms....
+``` pip3 install django-crispy-forms```
 
 checkout/views.py:
 ```
@@ -1674,7 +1675,26 @@ STRIPE_SECRET_KEY = os.getenv('STRIPE_SECRET_KEY', '')
 STRIPE_WH_SECRET = os.getenv('STRIPE_WH_SECRET', '')
 ```
 
+STRIPE uses the ISO 3166 standard of two letter country codes when handling shipping and
+billing information.
+
+Django has a package that utilises this.
+
+```pip3 install django-countries```
+
+```pip3 freeze > requirements.txt```
+
 ### Problem with asynchronous control.
+
+
+
+## Profiles
+
+A new app called profiles
+
+```python3 manage.py startapp profiles```
+
+Add app to settings.py.
 
 
 ## Gitpod Reminders
