@@ -1734,6 +1734,69 @@ A new app called profiles.
 Add app to settings.py.
 
 
+#### Securing views
+
+```from django.contrib.auth.decorators import login_required```
+
+...
+
+```@login_required```
+...then the def that needs protecting from unauthorised use via url address changes.
+
+Within the code:
+
+```
+    if not request.user.is_superuser:
+        messages.error(request, 'Sorry, only store owners can do that.')
+        return redirect(reverse('home')
+```
+
+#### Image field issues.
+
+Django uses widgets.
+From [Django Github](https://github.com/django/django/blob/master/django/forms/templates/django/forms/widgets/clearable_file_input.html)
+
+
+Create file Products/widgets.py:
+```
+from django.forms.widgets import ClearableFileInput
+from django.utils.translation import gettext_lazy as _
+
+
+class CustomClearableFileInput(ClearableFileInput):
+    clear_checkbox_label = _('Remove')
+    initial_text = _('Current Image')
+    input_text = _('')
+    template_name = 'products/custom_widget_templates/custom_clearable_file_input.html'
+```
+
+Products/templates/troducts/custom_widget_templates/custom_clearable_file_input.html:
+```
+{% if widget.is_initial %}
+    <p>{{ widget.initial_text }}:</p>
+    <a href="{{ widget.value.url }}">
+        <img width="96" height="96" class="rounded shadow-sm" src="{{ widget.value.url }}">
+    </a>
+    {% if not widget.required %}
+        <div class="custom-control custom-checkbox mt-2">
+            <input class="custom-control-input" type="checkbox" name="{{ widget.checkbox_name }}" id="{{ widget.checkbox_id }}">
+            <label class="custom-control-label text-danger" for="{{ widget.checkbox_id }}">{{ widget.clear_checkbox_label }}</label>
+        </div>
+    {% endif %}<br>
+    {{ widget.input_text }}
+{% endif %}
+<span class="btn btn-black rounded-0 btn-file">
+    Select Image <input id="new-image" type="{{ widget.type }}" name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>
+</span>
+<strong><p class="text-danger" id="filename"></p></strong>
+```
+
+Products/forms.py:
+```from .widgets import CustomClearableFileInput```
+
+
+
+
 ## Gitpod Reminders
 
 To run a frontend (HTML, CSS, Javascript only) application in Gitpod, in the terminal, type:
